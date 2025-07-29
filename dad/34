@@ -1,0 +1,6 @@
+// 34-р бодлого
+public class Problem34 {
+    public static void main(String[] args) {
+        System.out.println("Hello from 34th problem!");
+    }
+}
