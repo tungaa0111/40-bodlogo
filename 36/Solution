@@ -1,0 +1,95 @@
+import java.io.*;
+import java.util.*;
+
+public class LazyWhiteFalcon {
+    static int n, Q;
+    static List<Integer>[] adj;
+    static int LOG;
+    static int[] depth;
+    static int[][] up;
+    static int[] first, last, eulerTour;
+    static long[] fenw;
+    static int timer = 1;
+    static int[] val;
+
+    static void dfs(int u, int p) {
+        depth[u] = (p<0?0:depth[p]+1);
+        up[u][0] = (p<0?u:p);
+        for (int k = 1; k < LOG; k++) {
+            up[u][k] = up[ up[u][k-1] ][k-1];
+        }
+        first[u] = timer;
+        eulerTour[timer++] = u;
+        for (int v: adj[u]) if (v != p) dfs(v, u);
+        last[u] = timer;
+        eulerTour[timer++] = u;
+    }
+
+    static void fenwAdd(int i, long v) {
+        for (; i < fenw.length; i += i & -i) fenw[i] += v;
+    }
+    static long fenwSum(int i) {
+        long s = 0;
+        for (; i > 0; i -= i & -i) s += fenw[i];
+        return s;
+    }
+    static int lca(int u, int v) {
+        if (depth[u] < depth[v]) { int t=u; u=v; v=t; }
+        int diff = depth[u] - depth[v];
+        for (int k = 0; k < LOG; k++) if ((diff>>k & 1) != 0) u = up[u][k];
+        if (u == v) return u;
+        for (int k = LOG-1; k >= 0; k--) {
+            if (up[u][k] != up[v][k]) {
+                u = up[u][k];
+                v = up[v][k];
+            }
+        }
+        return up[u][0];
+    }
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        n = Integer.parseInt(st.nextToken());
+        Q = Integer.parseInt(st.nextToken());
+        adj = new ArrayList[n];
+        for (int i = 0; i < n; i++) adj[i] = new ArrayList<>();
+        for (int i = 0; i < n - 1; i++) {
+            st = new StringTokenizer(br.readLine());
+            int u = Integer.parseInt(st.nextToken());
+            int v = Integer.parseInt(st.nextToken());
+            adj[u].add(v);
+            adj[v].add(u);
+        }
+        LOG = 1; while ((1<<LOG) <= n) LOG++;
+        depth = new int[n];
+        up = new int[n][LOG];
+        first = new int[n]; last = new int[n];
+        eulerTour = new int[2*n + 5];
+        fenw = new long[2*n + 5];
+        val = new int[n];
+
+        dfs(0, -1);
+
+        StringBuilder out = new StringBuilder();
+        while (Q-- > 0) {
+            st = new StringTokenizer(br.readLine());
+            int type = Integer.parseInt(st.nextToken());
+            if (type == 1) {
+                int u = Integer.parseInt(st.nextToken());
+                int x = Integer.parseInt(st.nextToken());
+                int delta = x - val[u];
+                val[u] = x;
+                fenwAdd(first[u], delta);
+                fenwAdd(last[u], -delta);
+            } else {
+                int u = Integer.parseInt(st.nextToken());
+                int v = Integer.parseInt(st.nextToken());
+                int w = lca(u, v);
+                long sum = fenwSum(first[u]) + fenwSum(first[v]) - 2 * fenwSum(first[w]) + val[w];
+                out.append(sum).append('\n');
+            }
+        }
+        System.out.print(out);
+    }
+}
