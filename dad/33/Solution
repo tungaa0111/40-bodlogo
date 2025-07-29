@@ -1,0 +1,63 @@
+import java.util.*;
+
+class Result {
+    public static List<Integer> solve(List<Integer> arr, List<Integer> queries) {
+        List<Integer> result = new ArrayList<>();
+
+        for (int d : queries) {
+            result.add(minOfMax(arr, d));
+        }
+
+        return result;
+    }
+
+    private static int minOfMax(List<Integer> arr, int d) {
+        Deque<Integer> deque = new ArrayDeque<>();
+        List<Integer> maxList = new ArrayList<>();
+
+        for (int i = 0; i < arr.size(); i++) {
+            // Remove out-of-window indices
+            while (!deque.isEmpty() && deque.peekFirst() <= i - d) {
+                deque.pollFirst();
+            }
+
+            // Remove smaller elements from back
+            while (!deque.isEmpty() && arr.get(deque.peekLast()) <= arr.get(i)) {
+                deque.pollLast();
+            }
+
+            deque.offerLast(i);
+
+            // Record max for each full window
+            if (i >= d - 1) {
+                maxList.add(arr.get(deque.peekFirst()));
+            }
+        }
+
+        // Return minimum of all max values
+        return Collections.min(maxList);
+    }
+}
+public class Solution {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt(), q = sc.nextInt();
+
+        List<Integer> arr = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            arr.add(sc.nextInt());
+        }
+
+        List<Integer> queries = new ArrayList<>();
+        for (int i = 0; i < q; i++) {
+            queries.add(sc.nextInt());
+        }
+
+        List<Integer> result = Result.solve(arr, queries);
+        for (int val : result) {
+            System.out.println(val);
+        }
+
+        sc.close();
+    }
+}

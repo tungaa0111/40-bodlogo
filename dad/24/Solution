@@ -1,0 +1,109 @@
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
+
+class Node {
+    int data;
+    Node left;
+    Node right;
+
+    Node(int data) {
+        this.data = data;
+    }
+}
+
+class Result {
+    public static List<List<Integer>> swapNodes(List<List<Integer>> indexes, List<Integer> queries) {
+        Node root = new Node(1);
+        Queue<Node> queue = new LinkedList<>();
+        queue.add(root);
+        int i = 0;
+
+        while (!queue.isEmpty() && i < indexes.size()) {
+            Node current = queue.poll();
+            int leftVal = indexes.get(i).get(0);
+            int rightVal = indexes.get(i).get(1);
+
+            if (leftVal != -1) {
+                current.left = new Node(leftVal);
+                queue.add(current.left);
+            }
+            if (rightVal != -1) {
+                current.right = new Node(rightVal);
+                queue.add(current.right);
+            }
+
+            i++;
+        }
+
+        List<List<Integer>> result = new ArrayList<>();
+        for (int k : queries) {
+            swap(root, 1, k);
+            List<Integer> traversal = new ArrayList<>();
+            inOrder(root, traversal);
+            result.add(traversal);
+        }
+
+        return result;
+    }
+
+    private static void swap(Node node, int depth, int k) {
+        if (node == null) return;
+
+        if (depth % k == 0) {
+            Node temp = node.left;
+            node.left = node.right;
+            node.right = temp;
+        }
+
+        swap(node.left, depth + 1, k);
+        swap(node.right, depth + 1, k);
+    }
+
+    private static void inOrder(Node node, List<Integer> result) {
+        if (node == null) return;
+        inOrder(node.left, result);
+        result.add(node.data);
+        inOrder(node.right, result);
+    }
+}
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader =
+                new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bufferedWriter =
+                new BufferedWriter(new OutputStreamWriter(System.out));
+
+        int n = Integer.parseInt(bufferedReader.readLine().trim());
+        List<List<Integer>> indexes = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            String[] parts = bufferedReader.readLine().trim().split(" ");
+            List<Integer> pair = new ArrayList<>();
+            pair.add(Integer.parseInt(parts[0]));
+            pair.add(Integer.parseInt(parts[1]));
+            indexes.add(pair);
+        }
+
+        int t = Integer.parseInt(bufferedReader.readLine().trim());
+        List<Integer> queries = new ArrayList<>();
+
+        for (int i = 0; i < t; i++) {
+            int k = Integer.parseInt(bufferedReader.readLine().trim());
+            queries.add(k);
+        }
+
+        List<List<Integer>> result = Result.swapNodes(indexes, queries);
+
+        for (List<Integer> traversal : result) {
+            bufferedWriter.write(
+                traversal.stream().map(String::valueOf).collect(Collectors.joining(" "))
+            );
+            bufferedWriter.newLine();
+        }
+
+        bufferedReader.close();
+        bufferedWriter.close();
+    }
+}

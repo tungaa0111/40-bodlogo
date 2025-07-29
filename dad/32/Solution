@@ -1,0 +1,59 @@
+import java.util.*;
+
+public class Solution {
+
+    static final long MOD = 1_000_000_007;
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+
+        List<Integer>[] adj = new ArrayList[n + 1];
+        for (int i = 1; i <= n; i++) adj[i] = new ArrayList<>();
+
+        for (int i = 0; i < n - 1; i++) {
+            int u = sc.nextInt();
+            int v = sc.nextInt();
+            char color = sc.next().charAt(0);
+
+            if (color == 'b') { // only store black edges
+                adj[u].add(v);
+                adj[v].add(u);
+            }
+        }
+
+        boolean[] visited = new boolean[n + 1];
+        List<Integer> sizes = new ArrayList<>();
+
+        for (int i = 1; i <= n; i++) {
+            if (!visited[i]) {
+                int sz = dfs(i, visited, adj);
+                sizes.add(sz);
+            }
+        }
+
+        long total = (1L * n * (n - 1) * (n - 2)) / 6;
+        long exclude = 0;
+
+        for (int s : sizes) {
+            long count = (1L * s * (s - 1) * (s - 2)) / 6; // internal triplets
+            long cross = 1L * s * (s - 1) / 2 * (n - s);   // 2 in component, 1 outside
+            exclude = (exclude + count + cross) % MOD;
+        }
+
+        long result = (total - exclude + MOD) % MOD;
+        System.out.println(result);
+        sc.close();
+    }
+
+    static int dfs(int node, boolean[] visited, List<Integer>[] adj) {
+        visited[node] = true;
+        int size = 1;
+        for (int neighbor : adj[node]) {
+            if (!visited[neighbor]) {
+                size += dfs(neighbor, visited, adj);
+            }
+        }
+        return size;
+    }
+}

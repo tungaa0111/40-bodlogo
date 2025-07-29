@@ -1,0 +1,23 @@
+class SinglyLinkedListNode {
+    int data;
+    SinglyLinkedListNode next;
+}
+
+public class Solution {
+    public static int hasCycle(SinglyLinkedListNode head) {
+        if (head == null) return 0;
+
+        SinglyLinkedListNode slow = head;
+        SinglyLinkedListNode fast = head.next;
+
+        while (fast != null && fast.next != null) {
+            if (slow == fast) {
+                return 1; // Мөчлөг илэрлээ
+            }
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+
+        return 0; // Мөчлөг байхгүй
+    }
+}

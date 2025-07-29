@@ -1,0 +1,58 @@
+import java.util.*;
+
+public class Solution {
+
+    static int[] parent;
+    static int[] size;
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt(); // number of people
+        int q = sc.nextInt(); // number of queries
+
+        parent = new int[n + 1];
+        size = new int[n + 1];
+
+        for (int i = 1; i <= n; i++) {
+            parent[i] = i;  // initially, each person is in their own community
+            size[i] = 1;
+        }
+
+        for (int qi = 0; qi < q; qi++) {
+            String type = sc.next();
+            int a = sc.nextInt();
+
+            if (type.equals("Q")) {
+                System.out.println(size[find(a)]);
+            } else if (type.equals("M")) {
+                int b = sc.nextInt();
+                union(a, b);
+            }
+        }
+
+        sc.close();
+    }
+
+    static int find(int x) {
+        if (parent[x] != x) {
+            parent[x] = find(parent[x]); // path compression
+        }
+        return parent[x];
+    }
+
+    static void union(int x, int y) {
+        int px = find(x);
+        int py = find(y);
+
+        if (px != py) {
+            // union by size
+            if (size[px] < size[py]) {
+                parent[px] = py;
+                size[py] += size[px];
+            } else {
+                parent[py] = px;
+                size[px] += size[py];
+            }
+        }
+    }
+}

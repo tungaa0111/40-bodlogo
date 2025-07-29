@@ -1,0 +1,49 @@
+import java.io.*;
+import java.util.*;
+
+class Result {
+    public static List<Integer> matchingStrings(List<String> stringList, List<String> queries) {
+        Map<String, Integer> frequencyMap = new HashMap<>();
+        for (String str : stringList) {
+            frequencyMap.put(str, frequencyMap.getOrDefault(str, 0) + 1);
+        }
+
+        List<Integer> results = new ArrayList<>();
+        for (String query : queries) {
+            results.add(frequencyMap.getOrDefault(query, 0));
+        }
+
+        return results;
+    }
+}
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(System.out));
+
+        int stringListCount = Integer.parseInt(bufferedReader.readLine().trim());
+        List<String> stringList = new ArrayList<>();
+
+        for (int i = 0; i < stringListCount; i++) {
+            stringList.add(bufferedReader.readLine().trim());
+        }
+
+        int queriesCount = Integer.parseInt(bufferedReader.readLine().trim());
+        List<String> queries = new ArrayList<>();
+
+        for (int i = 0; i < queriesCount; i++) {
+            queries.add(bufferedReader.readLine().trim());
+        }
+
+        List<Integer> res = Result.matchingStrings(stringList, queries);
+
+        for (Integer count : res) {
+            bufferedWriter.write(String.valueOf(count));
+            bufferedWriter.newLine();
+        }
+
+        bufferedReader.close();
+        bufferedWriter.close();
+    }
+}

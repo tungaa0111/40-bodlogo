@@ -1,0 +1,40 @@
+import java.util.*;
+
+public class Solution {
+
+    public static long largestRectangle(List<Integer> heights) {
+        Stack<Integer> stack = new Stack<>();
+        long maxArea = 0;
+        int n = heights.size();
+
+        for (int i = 0; i <= n; i++) {
+            int currentHeight = (i == n) ? 0 : heights.get(i);
+
+            while (!stack.isEmpty() && currentHeight < heights.get(stack.peek())) {
+                int height = heights.get(stack.pop());
+                int width = stack.isEmpty() ? i : i - stack.peek() - 1;
+                long area = (long) height * width;
+                maxArea = Math.max(maxArea, area);
+            }
+
+            stack.push(i);
+        }
+
+        return maxArea;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+
+        List<Integer> heights = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            heights.add(scanner.nextInt());
+        }
+
+        long result = largestRectangle(heights);
+        System.out.println(result);
+
+        scanner.close();
+    }
+}
