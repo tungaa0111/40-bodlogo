@@ -1,0 +1,43 @@
+import java.util.*;
+
+class Result {
+    public static int poisonousPlants(List<Integer> p) {
+        Stack<int[]> stack = new Stack<>();
+        int maxDays = 0;
+
+        for (int i = 0; i < p.size(); i++) {
+            int days = 0;
+
+            // Remove all previous plants with equal or higher pesticide
+            while (!stack.isEmpty() && p.get(i) <= stack.peek()[0]) {
+                days = Math.max(days, stack.pop()[1]);
+            }
+
+            // If stack not empty, this plant has higher pesticide than left ones
+            if (!stack.isEmpty()) {
+                days += 1;
+            } else {
+                days = 0;
+            }
+
+            stack.push(new int[]{p.get(i), days});
+            maxDays = Math.max(maxDays, days);
+        }
+
+        return maxDays;
+    }
+}
+public class Solution {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        List<Integer> p = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            p.add(sc.nextInt());
+        }
+
+        System.out.println(Result.poisonousPlants(p));
+        sc.close();
+    }
+}

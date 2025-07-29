@@ -1,0 +1,51 @@
+import java.util.*;
+
+class Result {
+    public static List<Double> runningMedian(List<Integer> a) {
+        PriorityQueue<Integer> low = new PriorityQueue<>(Collections.reverseOrder()); // max-heap
+        PriorityQueue<Integer> high = new PriorityQueue<>(); // min-heap
+        List<Double> medians = new ArrayList<>();
+
+        for (int num : a) {
+            // Step 1: Insert into appropriate heap
+            if (low.isEmpty() || num <= low.peek()) {
+                low.offer(num);
+            } else {
+                high.offer(num);
+            }
+
+            // Step 2: Balance heaps
+            if (low.size() > high.size() + 1) {
+                high.offer(low.poll());
+            } else if (high.size() > low.size()) {
+                low.offer(high.poll());
+            }
+
+            // Step 3: Calculate median
+            if (low.size() == high.size()) {
+                medians.add((low.peek() + high.peek()) / 2.0);
+            } else {
+                medians.add((double) low.peek());
+            }
+        }
+
+        return medians;
+    }
+}public class Solution {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        List<Integer> a = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            a.add(sc.nextInt());
+        }
+
+        List<Double> result = Result.runningMedian(a);
+        for (double median : result) {
+            System.out.printf("%.1f\n", median);
+        }
+
+        sc.close();
+    }
+}
