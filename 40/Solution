@@ -1,0 +1,78 @@
+import java.io.*;
+import java.util.*;
+
+public class Solution {
+    static class Node {
+        int val, pr, size;
+        Node left, right;
+        Node(int v) { val = v; pr = new Random().nextInt(); size = 1; }
+    }
+    static int size(Node n) { return n == null ? 0 : n.size; }
+    static void upd(Node n) { if (n != null) n.size = 1 + size(n.left) + size(n.right); }
+
+    // split by left count = k elements into l (size=k) and r(rest)
+    static Node[] split(Node t, int k) {
+        if (t == null) return new Node[]{null, null};
+        if (size(t.left) >= k) {
+            Node[] p = split(t.left, k);
+            t.left = p[1]; upd(t);
+            return new Node[]{p[0], t};
+        } else {
+            Node[] p = split(t.right, k - size(t.left) - 1);
+            t.right = p[0]; upd(t);
+            return new Node[]{t, p[1]};
+        }
+    }
+
+    static Node merge(Node a, Node b) {
+        if (a == null) return b;
+        if (b == null) return a;
+        if (a.pr > b.pr) {
+            a.right = merge(a.right, b); upd(a); return a;
+        } else {
+            b.left = merge(a, b.left); upd(b); return b;
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String[] ln = br.readLine().split(" ");
+        int n = Integer.parseInt(ln[0]), q = Integer.parseInt(ln[1]);
+        String[] a = br.readLine().split(" ");
+        Node root = null;
+        for (int i = 0; i < n; i++) root = merge(root, new Node(Integer.parseInt(a[i])));
+
+        for (int i = 0; i < q; i++) {
+            ln = br.readLine().split(" ");
+            int type = Integer.parseInt(ln[0]), i1 = Integer.parseInt(ln[1]), j1 = Integer.parseInt(ln[2]);
+            // convert to 0-based and inclusive
+            int l = i1 - 1, len = j1 - l;
+            Node[] p1 = split(root, l);
+            Node[] p2 = split(p1[1], len);
+            Node middle = p2[0], rest = p2[1];
+            if (type == 1) {
+                // move to front
+                root = merge(middle, merge(p1[0], rest));
+            } else {
+                // move to back
+                root = merge(p1[0], merge(rest, middle));
+            }
+        }
+
+        // traverse inorder to get array
+        List<Integer> out = new ArrayList<>();
+        Deque<Node> stk = new ArrayDeque<>();
+        Node cur = root;
+        while (cur != null || !stk.isEmpty()) {
+            while (cur != null) { stk.push(cur); cur = cur.left; }
+            cur = stk.pop();
+            out.add(cur.val);
+            cur = cur.right;
+        }
+
+        int diff = Math.abs(out.get(0) - out.get(out.size() - 1));
+        System.out.println(diff);
+        for (int v : out) System.out.print(v + " ");
+    }
+}
+
